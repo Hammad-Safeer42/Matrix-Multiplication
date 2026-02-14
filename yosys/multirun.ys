@@ -1,0 +1,54 @@
+# MAX SPEED (use slow corner lib, tight -D)
+read_liberty -lib IHP130_sramcell_512x32lib.sec
+read_liberty -lib sg13g2_stdcell_slow_1p35V_125C.lib
+read_verilog -sv top_file.sv
+hierarchy -check -top mm_top
+synth -top mm_top
+dfflibmap -liberty sg13g2_stdcell_slow_1p35V_125C.lib
+opt
+abc -D 500 -liberty sg13g2_stdcell_slow_1p35V_125C.lib
+opt
+check
+tee -o report_speed_total.txt stat -liberty sg13g2_stdcell_slow_1p35V_125C.lib -liberty IHP130_sramcell_512x32lib.sec
+select -clear
+select t:sg13g2_*
+tee -o report_speed_stdcell_only.txt stat -liberty sg13g2_stdcell_slow_1p35V_125C.lib
+write_verilog -noattr netlist_speed.v
+design -reset
+
+
+# BALANCED (use typical corner lib, mid -D)
+read_liberty -lib IHP130_sramcell_512x32lib.sec
+read_liberty -lib sg13g2_stdcell_typ_1p20V_25C.lib
+read_verilog -sv top_file.sv
+hierarchy -check -top mm_top
+synth -top mm_top
+dfflibmap -liberty sg13g2_stdcell_typ_1p20V_25C.lib
+opt
+abc -D 2000 -liberty sg13g2_stdcell_typ_1p20V_25C.lib
+opt
+check
+tee -o report_balanced_total.txt stat -liberty sg13g2_stdcell_typ_1p20V_25C.lib -liberty IHP130_sramcell_512x32lib.sec
+select -clear
+select t:sg13g2_*
+tee -o report_balanced_stdcell_only.txt stat -liberty sg13g2_stdcell_typ_1p20V_25C.lib
+write_verilog -noattr netlist_balanced.v
+design -reset
+
+
+# MIN AREA (use fast corner lib, loose -D)
+read_liberty -lib IHP130_sramcell_512x32lib.sec
+read_liberty -lib sg13g2_stdcell_fast_1p32V_m40C.lib
+read_verilog -sv top_file.sv
+hierarchy -check -top mm_top
+synth -top mm_top
+dfflibmap -liberty sg13g2_stdcell_fast_1p32V_m40C.lib
+opt
+abc -D 20000 -liberty sg13g2_stdcell_fast_1p32V_m40C.lib
+opt
+check
+tee -o report_area_total.txt stat -liberty sg13g2_stdcell_fast_1p32V_m40C.lib -liberty IHP130_sramcell_512x32lib.sec
+select -clear
+select t:sg13g2_*
+tee -o report_area_stdcell_only.txt stat -liberty sg13g2_stdcell_fast_1p32V_m40C.lib
+write_verilog -noattr netlist_area.v

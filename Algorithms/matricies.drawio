@@ -1,0 +1,28 @@
+<mxfile host="65bd71144e">
+    <diagram id="pl8md1uNUEgjDsl62dxF" name="Page-1">
+        <mxGraphModel dx="748" dy="699" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="a11 a12 a13 a14 a15 a16 a17 a18&lt;div&gt;a21 a22 a23 a24 a25 a26 a27 a28&lt;div&gt;a31 a32 a33 a34 a35 a36 a37 a38&lt;div&gt;a41 a42 a43 a44 a45 a46 a47 a48&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" vertex="1" parent="1">
+                    <mxGeometry x="200" y="240" width="200" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="A =" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="265" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="c11 c12 c13 c14&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;c21 c22 c23 c24&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;c31 c32 c33 c34&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;c41 c42 c43 c44&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;c51 c52 c53 c54&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;c61 c62 c63 c64&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;c71 c72 c73 c74&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;c81 c82 c83 c84&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" vertex="1" parent="1">
+                    <mxGeometry x="480" y="220" width="100" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="C =" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="430" y="265" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="o11 o12 o13 o14&lt;div&gt;o21 o22 o23 o24&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;o31 o32 o33 o34&lt;/span&gt;&lt;/div&gt;&lt;div&gt;o41 o42 o43 o44&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" vertex="1" parent="1">
+                    <mxGeometry x="660" y="245" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="O =" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="265" width="60" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

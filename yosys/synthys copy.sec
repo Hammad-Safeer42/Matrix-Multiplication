@@ -1,0 +1,57 @@
+# Yosys example script
+
+# Yosys synthesis starter guide:
+# https://yosyshq.readthedocs.io/projects/yosys/en/0.40/getting_started/example_synth.html
+
+# 1) Read cells from liberty file as modules into current design
+read_liberty -lib IHP130_sramcell_512x32.lib # <= Read cells from liberty file as modules into current design
+
+# 2) Read the design files
+read_verilog -sv your_design.sv
+
+# 3) Check for blackboxes, expand and clean up design
+hierarchy -check -top your_design_top
+
+# Check your design in block diagram
+# show your_design_top
+
+# 4) Replace the submodules with their implementation
+flatten
+opt
+
+# 5) Translate process blocks (always@) to netlists
+proc 
+opt 
+
+# 6) Extract and optimize finite state machine
+fsm 
+opt 
+
+# 7) Map the cells to generic gate implementation provided by Yosys
+techmap 
+opt
+
+# Following command can be used instead of steps 4-7. Results will vary. 
+# More info on synth command: https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/index_techlibs_common.html#synth-generic-synthesis-script
+# synth -top your_design_top    
+
+# 8) Map generic DFFs to the IHP130nm DFFs 
+dfflibmap -liberty IHP130_stdcell.lib
+opt 
+
+# 9) Map the remaining gates to IHP130nm
+# Through this command, some area and timing optimizations can be done. 
+# Yosys page about ABC command: https://yosyshq.readthedocs.io/projects/yosys/en/0.40/cmd/abc.html
+# ABC project page: https://people.eecs.berkeley.edu/~alanmi/abc/
+abc -liberty IHP130_stdcell.lib
+opt
+
+# 10) Check for any issues
+check
+
+# 11) Save area statistics
+tee -o area_stdcell.txt \
+    stat -liberty IHP130_stdcell.lib -liberty IHP130_sramcell_512x32.lib
+
+# 12) Save Verilog Netlist
+write_verilog -noattr synthesized_design.v

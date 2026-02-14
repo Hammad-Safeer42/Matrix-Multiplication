@@ -1,0 +1,48 @@
+<mxfile host="65bd71144e">
+    <diagram id="TCLXNQcELz6-jxGGdkCn" name="Page-1">
+        <mxGraphModel dx="878" dy="563" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" target="5" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="480" y="200" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="3" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="5" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="600" y="200" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="4" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="5" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="580" y="200"/>
+                            <mxPoint x="580" y="120"/>
+                            <mxPoint x="440" y="120"/>
+                        </Array>
+                        <mxPoint x="440" y="160" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="5" value="Register 18 Bit" style="rounded=0;whiteSpace=wrap;html=1;rotation=-90;fillColor=#99FFFF;" parent="1" vertex="1">
+                    <mxGeometry x="480" y="180" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="To RAM" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#000000;dashed=1;fillColor=#99CCFF;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="185" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="ADDER" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#CCFF99;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="160" width="80" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="7" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="320" y="200" as="sourcePoint"/>
+                        <mxPoint x="370" y="150" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="9" value="From Multiplier" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="270" y="185" width="60" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

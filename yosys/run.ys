@@ -1,0 +1,47 @@
+# 1) Read cells from liberty files as modules into current design
+read_liberty -lib IHP130_sramcell_512x32lib.sec
+read_liberty -lib IHP130_stdcelllib.sec
+
+# Optional but recommended:
+# Read SRAM as a blackbox module (instead of parsing vendor RTL)
+#read_verilog -lib rm_sram_bb.v
+
+# 2) Read the design files
+# IMPORTANT: top_file.sv already includes the other .sv files, so read ONLY this one
+read_verilog -sv top_file.sv
+
+# 3) Check for blackboxes, expand and clean up design
+hierarchy -check -top mm_top
+
+# 4) Replace the submodules with their implementation
+flatten
+opt
+
+# 5) Translate process blocks (always@) to netlists
+proc
+opt
+
+# 6) Extract and optimize finite state machine
+fsm
+opt
+
+# 7) Map the cells to generic gate implementation provided by Yosys
+techmap
+opt
+
+# 8) Map generic DFFs to the IHP130nm DFFs
+dfflibmap -liberty IHP130_stdcelllib.sec
+opt
+
+# 9) Map the remaining gates to IHP130nm
+abc -liberty IHP130_stdcelllib.sec
+opt
+
+# 10) Check for any issues
+check
+
+# 11) Save area statistics
+tee -o area_stdcell.txt stat -liberty IHP130_stdcelllib.sec -liberty IHP130_sramcell_512x32lib.sec
+
+# 12) Save Verilog Netlist
+write_verilog -noattr synthesized_design.v

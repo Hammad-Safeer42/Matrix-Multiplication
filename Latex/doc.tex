@@ -1,0 +1,659 @@
+\documentclass[]{article}
+
+\usepackage[
+top=10mm,
+bottom=20mm,
+left=10mm,
+right=10mm
+]{geometry}
+
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{circuitikz}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{relsize}
+\usepackage{multicol}
+\usepackage{gensymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage{pdflscape}
+
+% --- Cover page helpers ---
+\usepackage{titlesec}
+\usepackage{setspace}
+
+\usetikzlibrary{positioning,fit,backgrounds,shapes,automata}
+
+% Compact lists (kept from your file)
+\let\tempone\itemize
+\let\temptwo\enditemize
+\renewenvironment{itemize}{\tempone\setlength{\itemsep}{-0.2\baselineskip}}{\temptwo}
+\renewenvironment{enumerate}{\tempone\setlength{\itemsep}{-0.2\baselineskip}}{\temptwo}
+
+\begin{document}
+
+
+\begin{titlepage}
+    \centering
+    \vspace*{10mm}
+
+    {\Large \textbf{Technical Report}\par}
+    \vspace{6mm}
+
+    {\huge \textbf{Matrix Multiplication Accelerator}\par}
+    \vspace{6mm}
+
+    {\large RTL Design, Simulation, Throughput and ASIC Synthesis Results\par}
+    \vspace{12mm}
+
+    % Modern accent line
+    \noindent\rule{0.85\linewidth}{0.8pt}\par
+    \vspace{10mm}
+
+    {\large \textbf{Team Members}\par}
+    \vspace{4mm}
+
+    {\Large Hammad Safeer\par}
+    \vspace{2mm}
+    {\Large Jan Hofmann\par}
+
+    \vfill
+
+    {\large \today\par}
+\end{titlepage}
+
+
+\tableofcontents
+\clearpage
+
+\begin{abstract}
+
+    With the increasing usage of artificial intelligence and especially large language models, the challenge of performing large and energy efficient matrix multiplications has become a topic of interest. ASICs are well known to allow for high-speed, energy-effiecient implementations of algorithms. Because of this, it was our task to design an IC which is capable of multiplying a 4x8 and a 8x4 matrix together, resulting in an matrix multiplication accelerator, which this report is written about.\\ \hfill \\
+    This report gives a quick userguide, followed by an in-depth explanation of the impemented design as well as showing the results of multiple synthesis runs.
+\end{abstract}
+
+\newpage
+
+
+\section{Usage}
+
+The accelerator has three basic interactions: \textbf{Reset}, \textbf{Calculate Matix} and \textbf{Read Result}.
+\subsection*{Reset}
+
+To perform a reset follow the steps given below.
+\begin{enumerate}
+    \item Set \textbf{rst}=1
+\end{enumerate}
+
+Note that a reset also stops any running calculations, but does not delete the contents stored in the RAM.
+
+\subsection*{Calculate Matrix}
+
+\begin{enumerate}
+    \item Ensure that accelerator is either reset or not currently working
+    \item Set \textbf{ram\_slot} to indicate where in the RAM the result should be written to (possible values are 0 to 31)
+    \item Set \textbf{start}=1
+    \item During the \textbf{start}=1 cycle as well as the following 31 cycles provide the input matrix columnwise via the \textbf{in\_data} port
+\end{enumerate}
+
+After the input data is provided the accelerator will start calculation automatically. Once it is finished the \textbf{finish} signal will be set to $1$. In the next cycle the accelerator is ready to calculate anoter Matrix.
+
+\subsection*{Read Result}
+
+The result of a calculation is not returned immediately, but stored in an internal block of RAM instead. In order to read the result, perform the following steps.
+
+\begin{enumerate}
+    \item Ensure that accelerator is not currently working
+    \item Set \textbf{ram\_slot} to indicate which matrix you want to read from
+    \item Set \textbf{start}=0
+    \item Set \textbf{read}=1
+\end{enumerate}
+    In the cycle after \textbf{read} is set, the first half of the first value will be retured via the \textbf{out\_data} port. The values of the Matrix are provided columnwise, with each value taking two cycles to return. For each value the lower (LSB) half will be provided first, followed by the upper (MSB) half in the next cycle. The total readout lasts 32 cycles.
+
+
+    \newpage
+
+\section{Design Process}
+    %Note: if you think this is unnecessary you can remove this section
+    
+    Before any verilog-code was programmed a design phase happened, during which the exact algorithm was decided upon. Several restrictions influenced the design process, such as the number of multipliers available, the width of input and output ports or the required ordering of the output matrix. Afterwards, an ASMD (see figure \ref{fig:asmd}) as well schematic block diagram of the accelerator (see figure \ref{fig:arch}) was created. To verify the the functionality of the ASMD, its behaviour was "simulated" on paper, with some quick MATLAB checks for good measure.
+    
+    
+    The implementation orients itself on the schematic in figure \ref{fig:asmd}, whith each block being turned into its own module (The RAM-Module was already implemented, and used as provided). Once all submodules were implemented, they were connected together in a larger top-module.
+
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/architecture.png}
+    \caption{Architecture of the accelerator}
+    \label{fig:arch}
+\end{figure}
+
+
+The implemented top-module was then simulated and any occuring bugs were fixed. Simulation was done in EDA-playground as well as Xilinx Vivado. The correctness of the simulation was verified both visually, through observation of the generated waveform files, and automatically through the testbench comparing returned values with expected values provided through a MATLAB script.
+
+% TODO: ADD infos on synthesis
+
+\newpage
+
+\section{Architecture}
+
+In order to allow for better maintainability, as well as the potential for future updates, a modular architecture was chosen, which can be seen in figure \ref{fig:arch}.
+
+
+
+The following list contains all modules, as well as the name of the file they are located in.
+\begin{itemize}
+    \item Top Module: top\_file.sv
+    \item Control Unit: calc\_asmd.sv
+    \item Input Register: ireg.sv
+    \item Multipliers: mul.sv
+    \item MAC-Unit: mac\_unit.sv
+    \item RAM write logic: ram\_mux.sv
+    \item RAM: RM\_IHPSG13\_1P\_512x32\_c2\_bm\_bist.v
+    \item Output Logic: output\_logic.sv
+    \item ROM: rom.sv
+\end{itemize}
+
+\subsection*{Control Unit}
+The \textbf{Control Unit} implements the ASMD given in figure \ref{fig:asmd}. Starting in the \textbf{idle} state, the user can either indicate a matrix-calculation via the \textbf{start} signal or read out a matrix by setting \textbf{read}. In addition to this the \textbf{ram\_slot} must be provided, which is a number between 0 and 31 and indicates where in the RAM the result will be stored/is read from. After \textbf{start} is set the ASMD moves into the \textbf{READ INPUT} state, which is left once all 32 values of the input matrix are stored in the input register. Afterwards the first column will be calculated in the \textbf{CALC COLUMN} and written to RAM in the \textbf{write column}. This process repeats a total of for times (once for each column of the output matrix), before the \textbf{finish} flag is set, and the ASMD returns to \textbf{IDLE}. If \textbf{read} is set the ASMD starts to toggle between the \textbf{READ FIRST} and \textbf{READ SECOND} state, which return the lower (LSB) and upper (MSB) half of one output value. This switching repeats 16 times, once for each value of the output matrix.
+
+
+\subsection*{Input Register}
+Holds the input matrix. In total the register file consists of 32 8-Bit registers, with one write and 4 read ports (one for each multiplier)
+
+\subsection*{Multipliers and Adders}
+The name MAC-Unit is technically wrong, it only performs the accumulation part of "multiply and accumulate". The reason for this is that having external multipliers allows for easier exchanging the multipliers if a faster or cheaper multiplier is used. In addition it allows for inserting a pipeline stage in the future, which splits the long critical path from input register to multipliers to adder to internal buffer register, and thereby allows for higher clockspeeds.
+
+\subsection*{RAM Write Logic}
+Since the RAM has only one port, the four results of the MAC-Units must be multiplexed. This happens during the \textbf{WRITE COLUMN} state.
+
+\subsection*{Output Logic}
+This module is needed during the readout of a matrix. To safe on the number of pins, the \textbf{out\_data} port is only 9 Bits wide instead of the 18 Bits needed to return a full value of the output matrix. It is this modules job to split the values before returning them one after the other.
+
+\subsection*{RAM and ROM}
+The RAM is used to store results calculated with the help of the coefficients stored in the ROM.
+The RAM consists of 512 32-Bit lines. With one line per value being used, this means that the RAM can store up to 32 matrices. It is the users job to tell the accelerator which part of the RAM should be used for storage/readout via the \textbf{ram\_slot} port.
+
+\vspace{5mm}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/ASMD_smaller.png}
+    \caption{ASMD that controls the accelerator}
+    \label{fig:asmd}
+\end{figure}
+
+\vspace{5mm}
+
+\newpage
+
+% \section{Critical Path}
+
+% The critical path delay can be expressed as:
+% \[
+% t_{\text{critical}} = t_{clk\rightarrow q} + t_{\text{mult}} + t_{\text{add}} + t_{\text{setup}}
+% \]
+% where $t_{clk\rightarrow q}$ is the clock-to-$Q$ delay, $t_{\text{mult}}$ is the multiplier delay, $t_{\text{add}}$ is the adder delay, and $t_{\text{setup}}$ is the setup time of the receiving register.
+
+
+
+
+% \section{Simulations and Result Confirmations}
+
+% To verify the functionality of the accelerator design, we performed extensive simulations using \textbf{Xilinx Vivado}. 
+% The complete RTL implementation was simulated successfully, and the design operated as expected without any functional errors.
+
+% During simulation, we were able to observe the internal control signals and data flow clearly in the Vivado waveform output. 
+% The accelerator correctly executed matrix multiplications over multiple iterations and produced valid results for several different input matrices.
+
+% Furthermore, the outputs were confirmed both through the waveform analysis and the printed testbench results. 
+% The \textbf{finish} flag was asserted correctly at the end of each computation, and the calculated matrix values were stored and read back properly from RAM.
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.9\linewidth]{figures/Simulation_output.png}
+%     \caption{Vivado simulation waveform output confirming correct matrix multiplication results.}
+%     \label{fig:sim_output}
+% \end{figure}
+
+
+
+% \newpage
+
+\section{Throughput and Critical Path}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.4}
+
+\begin{tabular}{|p{4cm}|p{8cm}|p{2cm}|}
+\hline
+\textbf{Throughput Step} & \textbf{Description} & \textbf{Cycles} \\
+\hline
+
+Load Data &
+32 cycles are required to load 32 input values into the accelerator. &
+32 \\
+\hline
+
+Calculate Multiplications and Accumulate &
+It takes 8 clock cycles to compute 4 output values in parallel.
+Therefore, producing all 16 output elements requires 4 iterations,
+i.e., \textbf{32 clock cycles in total}. &
+32 \\
+\hline
+
+Multiplexing Write to RAM &
+4 cycles are required per write operation, repeated 4 times,
+resulting in a total of 16 cycles. &
+16 \\
+\hline
+
+RAM Read Output &
+Each value takes 2 cycles to be returned. With 16 output elements,
+a total of 32 cycles is needed for output readout. &
+32 \\
+\hline
+
+\textbf{Total Cycles without Read} &
+$32 + 32 + 16 = 80$ &
+\textbf{80} \\
+\hline
+
+\textbf{Total Cycles with Read} &
+$32 + 32 + 16 + 32 = 112$ &
+\textbf{112} \\
+\hline
+
+\end{tabular}
+
+\caption{Throughput breakdown and total cycle count for matrix computation and readout.}
+\label{tab:throughput}
+
+\end{table}
+
+
+
+\newpage
+
+
+\section{Synthesis Results}
+
+During ASIC synthesis, we evaluated different optimization objectives, including \textbf{speed}, \textbf{balanced}, and \textbf{area} modes, to see whether the tool could significantly improve area or utilization.The overall synthesized design structure, as generated by the Yosys \texttt{show} command, is illustrated in Figure~\ref{fig:synth_landscape}.
+The results remained nearly identical across all modes when using the same standard cell library. Both total area and sequential element count showed only negligible variation, indicating limited optimization potential through logic restructuring. \\
+This is mainly because the design is strongly \textbf{memory dominated}. The SRAM macro occupies about $79{,}700~\mu m^{2}$, contributing more than $76\%$ of the total chip area, while standard-cell logic accounts for only around $24\%$. Therefore, synthesis-level logic optimizations have little influence on the overall result. \\
+To achieve more noticeable differences, we synthesized the design with different standard cell libraries for \textbf{slow}, \textbf{typical}, and \textbf{fast} process corners. Unlike optimization flags, changing the library affected delay and area trade-offs, leading to more meaningful variations in synthesis outcomes. An area comparison across the three optimization modes using different standard cell libraries is shown in Figure~\ref{fig:synth_area_comp}.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.3}
+
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{Optimization Mode} & \textbf{Library} & \textbf{Standard Cell File} \\ \hline
+Speed    & Std cell Lib 1 & sg13g2\_stdcell\_slow\_1p35V\_125C.lib \\ \hline
+Balanced & Std cell Lib 2 & sg13g2\_stdcell\_typ\_1p20V\_25C.lib   \\ \hline
+Area     & Std cell Lib 3 & g13g2\_stdcell\_fast\_1p32V\_m40C.lib  \\ \hline
+\end{tabular}
+
+\caption{Standard cell libraries used for synthesis under different optimization objectives.}
+\label{tab:stdcell_libs}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.4}
+
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Optimization} &
+\textbf{Std-cell area ($\mu m^{2}$)} &
+\textbf{Total area ($\mu m^{2}$)} &
+\textbf{Sequential area ($\mu m^{2}$)} &
+\textbf{Seq \%} &
+\textbf{Total cells} \\ \hline
+
+Speed &
+24300.52 &
+104020.42 &
+5437.76 &
+5.23 &
+2022 \\ \hline
+
+Balanced &
+24155.45 &
+103875.35 &
+5437.76 &
+5.23 &
+2011 \\ \hline
+
+Area &
+24155.45 &
+103875.35 &
+5437.76 &
+5.23 &
+2011 \\ \hline
+
+\end{tabular}
+
+\caption{ASIC synthesis results for different optimization modes.}
+\label{tab:synth_results}
+\end{table}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.3}
+
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Cell group} & \textbf{Speed} & \textbf{Balanced} & \textbf{Area} \\ \hline
+
+XOR + XNOR &
+337 (135 + 202) &
+337 (131 + 206) &
+337 (131 + 206) \\ \hline
+
+NAND (all) &
+408 &
+383 &
+383 \\ \hline
+
+NOR (all) &
+196 &
+226 &
+226 \\ \hline
+
+AND (all) &
+169 &
+163 &
+169 \\ \hline
+
+OR (all) &
+116 &
+104 &
+116 \\ \hline
+
+MUX2 &
+20 &
+18 &
+18 \\ \hline
+
+INV &
+86 &
+85 &
+86 \\ \hline
+
+\end{tabular}
+
+\caption{Arithmetic-relevant standard cell comparison across all three synthesis runs.}
+\label{tab:cell_comparison}
+
+\end{table}
+
+
+
+
+\newpage
+\clearpage
+
+\begin{landscape}
+\vspace*{\fill}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.35\textwidth]{figures/synthesisresult.pdf}
+    \caption{Synthesis resulted design.}
+    \label{fig:synth_landscape}
+\end{figure}
+
+\vspace*{\fill}
+\end{landscape}
+
+\clearpage
+
+
+
+
+\newpage
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/areaComp.png}
+    \caption{Area comparison across different standard cell libraries.}
+    \label{fig:synth_area_comp}
+\end{figure}
+
+
+Figure~\ref{fig:synth_results_all} illustrates the standard-cell composition across the three synthesis runs (speed, balanced, and area). 
+The plots highlight that arithmetic-related cells such as XOR/XNOR and NAND dominate the logic utilization, while differences between optimization modes remain small. 
+
+\begin{figure}[H]
+    \centering
+
+    \includegraphics[width=0.45\linewidth]{figures/synthesisResult1.jpg}
+    \includegraphics[width=0.45\linewidth]{figures/synthesisResult2.jpg}
+
+    \vspace{3mm}
+
+    \includegraphics[width=0.45\linewidth]{figures/synthesisResult3.jpg}
+    \includegraphics[width=0.45\linewidth]{figures/synthesisResult4.jpg}
+
+    \caption{Synthesis result reports for different optimization modes and libraries.}
+    \label{fig:synth_results_all}
+\end{figure}
+
+
+\newpage
+% \subsection*{Yosys Synthesis Results}
+
+% The following synthesis reports were generated using \textbf{Yosys} under different optimization objectives.
+
+% \bigskip
+% \noindent\textbf{Speed:}
+
+% \begin{verbatim}
+% === mm_top ===
+%         +----------Local Count, excluding submodules.
+%         |        +-Local Area, excluding submodules.
+%      1891        - wires
+%      2559        - wire bits
+%        89        - public wires
+%       757        - public wire bits
+%         8        - ports
+%        27        - port bits
+%         2        - memories
+%       480        - memory bits
+%         1 7.97E+004   RM_IHPSG13_1P_512x32_c2_bm_bist
+%        35  444.528   sg13g2_a21o_1
+%       193 1.75E+003   sg13g2_a21oi_1
+%         4   58.061   sg13g2_a221oi_1
+%        89  965.525   sg13g2_a22oi_1
+%        84  762.048   sg13g2_and2_1
+%        54  685.843   sg13g2_and3_1
+%        31  449.971   sg13g2_and4_1
+%       111 5.44E+003   sg13g2_dfrbpq_1
+%        86  468.115   sg13g2_inv_1
+%        20   362.88   sg13g2_mux2_1
+%       236 1.71E+003   sg13g2_nand2_1
+%       104  943.488   sg13g2_nand2b_1
+%        60   544.32   sg13g2_nand3_1
+%         3   38.102   sg13g2_nand3b_1
+%         5   54.432   sg13g2_nand4_1
+%        88  638.669   sg13g2_nor2_1
+%        69  625.968   sg13g2_nor2b_1
+%        37  335.664   sg13g2_nor3_1
+%         2   21.773   sg13g2_nor4_1
+%       205  1859.76   sg13g2_o21ai_1
+%        62  562.464   sg13g2_or2_1
+%        54  685.843   sg13g2_or3_1
+%       202  2932.07   sg13g2_xnor2_1
+%       135 1.96E+003   sg13g2_xor2_1
+%    Chip area for module '\mm_top': 104020.421400
+%      of which used for sequential elements: 5437.756800 (5.23%)
+% \end{verbatim}
+
+% \bigskip
+% \noindent\textbf{Area:}
+
+% \begin{verbatim}
+% === mm_top ===
+%         +----------Local Count, excluding submodules.
+%         |        +-Local Area, excluding submodules.
+%      1880        - wires
+%      2548        - wire bits
+%        89        - public wires
+%       757        - public wire bits
+%         8        - ports
+%        27        - port bits
+%         2        - memories
+%       480        - memory bits
+%         1 7.97E+004   RM_IHPSG13_1P_512x32_c2_bm_bist
+%        32  406.426   sg13g2_a21o_1
+%       197 1.79E+003   sg13g2_a21oi_1
+%         4   58.061   sg13g2_a221oi_1
+%        87  943.828   sg13g2_a22oi_1
+%        79  716.688   sg13g2_and2_1
+%        52  660.442   sg13g2_and3_1
+%        32  464.486   sg13g2_and4_1
+%       111 5.44E+003   sg13g2_dfrbpq_1
+%        85  462.672   sg13g2_inv_1
+%        18  326.592   sg13g2_mux2_1
+%       223 1.62E+003   sg13g2_nand2_1
+%       104  943.488   sg13g2_nand2b_1
+%        54  489.888   sg13g2_nand3_1
+%         2   25.402   sg13g2_nand3b_1
+%         7   76.205   sg13g2_nand4_1
+%       102  740.275   sg13g2_nor2_1
+%        72  653.184   sg13g2_nor2b_1
+%        49  444.528   sg13g2_nor3_1
+%         3   32.659   sg13g2_nor4_1
+%       204 1.85E+003   sg13g2_o21ai_1
+%        54  489.888   sg13g2_or2_1
+%        50   635.04   sg13g2_or3_1
+%       206 2.99E+003   sg13g2_xnor2_1
+%       131 1.9E+003   sg13g2_xor2_1
+%    Chip area for module '\mm_top': 103875.345000
+%      of which used for sequential elements: 5437.756800 (5.23%)
+% \end{verbatim}
+
+% \bigskip
+% \noindent\textbf{Balanced:}
+
+% \begin{verbatim}
+% === mm_top ===
+%         +----------Local Count, excluding submodules.
+%         |        +-Local Area, excluding submodules.
+%      1880        - wires
+%      2548        - wire bits
+%        89        - public wires
+%       757        - public wire bits
+%         8        - ports
+%        27        - port bits
+%         2        - memories
+%       480        - memory bits
+%         1 7.97E+004   RM_IHPSG13_1P_512x32_c2_bm_bist
+%        32  406.426   sg13g2_a21o_1
+%       197 1.79E+003   sg13g2_a21oi_1
+%         4   58.061   sg13g2_a221oi_1
+%        87  943.828   sg13g2_a22oi_1
+%        79  716.688   sg13g2_and2_1
+%        52  660.442   sg13g2_and3_1
+%        32  464.486   sg13g2_and4_1
+%       111 5.44E+003   sg13g2_dfrbpq_1
+%        85  462.672   sg13g2_inv_1
+%        18  326.592   sg13g2_mux2_1
+%       223 1.62E+003   sg13g2_nand2_1
+%       104  943.488   sg13g2_nand2b_1
+%        54  489.888   sg13g2_nand3_1
+%         2   25.402   sg13g2_nand3b_1
+%         7   76.205   sg13g2_nand4_1
+%       102  740.275   sg13g2_nor2_1
+%        72  653.184   sg13g2_nor2b_1
+%        49  444.528   sg13g2_nor3_1
+%         3   32.659   sg13g2_nor4_1
+%       204 1.85E+003   sg13g2_o21ai_1
+%        54  489.888   sg13g2_or2_1
+%        50   635.04   sg13g2_or3_1
+%       206 2.99E+003   sg13g2_xnor2_1
+%       131 1.9E+003   sg13g2_xor2_1
+%    Chip area for module '\mm_top': 103875.345000
+%      of which used for sequential elements: 5437.756800 (5.23%)
+% \end{verbatim}
+
+
+\clearpage
+\appendix
+
+\section{Appendix}
+
+\subsection*{Appendix A: Testbench}
+
+The SystemVerilog testbench used for functional verification is provided in:
+
+\begin{itemize}
+    \item tb.sv
+\end{itemize}
+
+\subsection*{Appendix B: Top Module for Matrix Multiplication}
+
+The top-level module of the accelerator design is included in:
+
+\begin{itemize}
+    \item top\_file.sv
+\end{itemize}
+
+\subsection*{Appendix C: Other Modules for Matrix Multiplication}
+
+The remaining submodules used in the accelerator implementation are listed below:
+
+\begin{itemize}
+    \item calc\_asmd.sv
+    \item ireg.sv
+    \item mac\_unit.sv
+    \item mul.sv
+    \item output\_logic.sv
+    \item ram\_mux.sv
+    \item read\_asmd.sv
+    \item rom.sv
+\end{itemize}
+
+\subsection*{Appendix D: RAM Modules}
+
+The two RAM Modules required for the design are as follows:
+
+\begin{itemize}
+    \item RM\_IHPSG13\_1P\_512x32\_c2\_bm\_bist.v
+    \item RM\_IHPSG13\_1P\_core\_behavioral\_bm\_bist.v
+\end{itemize}
+
+\subsection*{Appendix E: Synthesized Design Netlists}
+
+The synthesized gate-level netlists generated under different optimization objectives are:
+
+\begin{itemize}
+    \item netlist\_speed.v
+    \item netlist\_balanced.v
+    \item netlist\_area.v
+\end{itemize}
+
+\subsection*{Appendix F: Yosys Script}
+
+The Yosys synthesis script used for multi-run synthesis is provided in:
+
+\begin{itemize}
+    \item multirun.ys
+\end{itemize}
+
+
+
+\end{document}

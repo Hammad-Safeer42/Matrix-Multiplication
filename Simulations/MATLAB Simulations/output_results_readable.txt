@@ -1,0 +1,320 @@
+Results for matrix P(1)
+46029
+48284
+47275
+43883
+32356
+22655
+36888
+10615
+11907
+8526
+13088
+5311
+5756
+5160
+3470
+3154
+Average value of diagonal elements of matrix = 2.123150e+04
+Maximum value in matrix = 48284, hex(0x0000bc9c)
+*********
+Results for matrix P(2)
+20369
+55029
+63006
+35531
+36936
+34548
+20837
+24808
+9116
+11544
+10550
+8046
+2229
+3158
+4350
+2779
+Average value of diagonal elements of matrix = 1.706150e+04
+Maximum value in matrix = 63006, hex(0x0000f61e)
+*********
+Results for matrix P(3)
+37343
+34765
+13445
+54255
+42918
+56356
+17599
+28809
+13024
+19434
+7741
+12342
+4179
+5814
+2823
+3594
+Average value of diagonal elements of matrix = 2.625850e+04
+Maximum value in matrix = 56356, hex(0x0000dc24)
+*********
+Results for matrix P(4)
+31526
+37083
+28776
+36668
+27541
+33954
+17928
+6728
+7370
+12749
+6235
+5792
+3538
+5182
+4242
+3346
+Average value of diagonal elements of matrix = 1.876525e+04
+Maximum value in matrix = 37083, hex(0x000090db)
+*********
+Results for matrix P(5)
+50122
+27197
+41570
+49161
+47350
+42262
+30777
+49086
+14810
+15774
+9790
+16933
+6339
+4033
+4889
+6193
+Average value of diagonal elements of matrix = 2.709175e+04
+Maximum value in matrix = 50122, hex(0x0000c3ca)
+*********
+Results for matrix P(6)
+17741
+45626
+22475
+58644
+32149
+26903
+50798
+41682
+10919
+11022
+12034
+15227
+3457
+5210
+3116
+6459
+Average value of diagonal elements of matrix = 1.578425e+04
+Maximum value in matrix = 58644, hex(0x0000e514)
+*********
+Results for matrix P(7)
+42147
+10877
+45398
+20220
+16832
+17991
+35230
+33856
+7091
+9314
+11857
+7593
+3528
+3449
+4662
+1637
+Average value of diagonal elements of matrix = 18408
+Maximum value in matrix = 45398, hex(0x0000b156)
+*********
+Results for matrix P(8)
+38966
+44410
+25359
+32937
+50032
+37270
+52488
+40645
+18837
+14187
+14052
+12539
+5992
+3886
+3505
+4640
+Average value of diagonal elements of matrix = 23732
+Maximum value in matrix = 52488, hex(0x0000cd08)
+*********
+Results for matrix P(9)
+26737
+52591
+60515
+61095
+25025
+24465
+45201
+23069
+9377
+11110
+16148
+11724
+2907
+5015
+6178
+5345
+Average value of diagonal elements of matrix = 1.817375e+04
+Maximum value in matrix = 61095, hex(0x0000eea7)
+*********
+Results for matrix P(10)
+46688
+21391
+52702
+52954
+23957
+35318
+17807
+54626
+9174
+14090
+10065
+18612
+3290
+5237
+4638
+5372
+Average value of diagonal elements of matrix = 2.436075e+04
+Maximum value in matrix = 54626, hex(0x0000d562)
+*********
+Results for matrix P(11)
+32219
+31098
+26198
+31330
+32889
+37920
+33743
+50297
+12116
+13181
+6062
+15138
+3191
+4754
+1676
+3335
+Average value of diagonal elements of matrix = 19884
+Maximum value in matrix = 50297, hex(0x0000c479)
+*********
+Results for matrix P(12)
+23040
+35239
+35523
+45436
+52568
+45935
+48160
+42498
+16589
+14505
+16284
+12647
+4273
+3727
+5257
+4804
+Average value of diagonal elements of matrix = 2.251575e+04
+Maximum value in matrix = 52568, hex(0x0000cd58)
+*********
+Results for matrix P(13)
+39152
+33121
+41731
+53506
+42703
+34253
+29155
+49357
+14208
+12930
+9286
+13106
+5537
+4538
+2579
+4034
+Average value of diagonal elements of matrix = 2.168125e+04
+Maximum value in matrix = 53506, hex(0x0000d102)
+*********
+Results for matrix P(14)
+30478
+31375
+21769
+44188
+9695
+52089
+23993
+21463
+5871
+14860
+8378
+8264
+1385
+4460
+2186
+3773
+Average value of diagonal elements of matrix = 2.367950e+04
+Maximum value in matrix = 52089, hex(0x0000cb79)
+*********
+Results for matrix P(15)
+48725
+45193
+41857
+42140
+15863
+49614
+48274
+29262
+7784
+14341
+14145
+10578
+2350
+4966
+3648
+3850
+Average value of diagonal elements of matrix = 2.908350e+04
+Maximum value in matrix = 49614, hex(0x0000c1ce)
+*********
+Results for matrix P(16)
+6571
+22914
+8477
+22361
+23378
+28118
+28361
+54131
+9387
+10110
+8557
+13719
+4594
+3100
+3017
+4197
+Average value of diagonal elements of matrix = 1.186075e+04
+Maximum value in matrix = 54131, hex(0x0000d373)
+*********
